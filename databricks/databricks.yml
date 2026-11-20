@@ -1,0 +1,13 @@
+bundle:
+  name: elt-benchmark
+
+variables:
+  tpcdi_path:
+    description: Workspace path of the databricks-tpc-di repo that holds the benchmark notebooks (the folder that contains src/).
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    default: true
