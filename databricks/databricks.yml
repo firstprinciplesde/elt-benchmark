@@ -6,7 +6,7 @@ variables:
     description: Workspace path of the databricks-tpc-di repo that holds the benchmark notebooks (the folder that contains src/).
 
 include:
-  - resources/*.yml
+  - resources/augmented_*.yml
 
 targets:
   dev:

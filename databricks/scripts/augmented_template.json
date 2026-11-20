@@ -1,0 +1,430 @@
+{
+ "setup": {
+  "max_retries": 3,
+  "min_retry_interval_millis": 15000,
+  "notebook_task": {
+   "base_parameters": {
+    "catalog": "{{job.parameters.catalog}}",
+    "incremental_batches_to_run": "{{job.parameters.incremental_batches_to_run}}",
+    "scale_factor": "{{job.parameters.scale_factor}}",
+    "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+    "wh_db": "{{job.parameters.wh_db}}"
+   },
+   "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/setup"
+  },
+  "retry_on_timeout": true,
+  "task_key": "setup"
+ },
+ "cleanup": {
+  "depends_on": [
+   {
+    "outcome": "true",
+    "task_key": "delete_when_finished_TRUE_FALSE"
+   }
+  ],
+  "max_retries": 3,
+  "min_retry_interval_millis": 15000,
+  "notebook_task": {
+   "base_parameters": {
+    "catalog": "{{job.parameters.catalog}}",
+    "scale_factor": "{{job.parameters.scale_factor}}",
+    "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+    "wh_db": "{{job.parameters.wh_db}}"
+   },
+   "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/teardown"
+  },
+  "retry_on_timeout": true,
+  "task_key": "cleanup"
+ },
+ "day": [
+  {
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "batch_date": "{{job.parameters.batch_date}}",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/simulate_filedrops"
+   },
+   "retry_on_timeout": true,
+   "task_key": "simulate_filedrops"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "simulate_filedrops"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "Table": "account",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/ingest_bronze"
+   },
+   "retry_on_timeout": true,
+   "task_key": "bronzeaccount"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "simulate_filedrops"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "Table": "cashtransaction",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/ingest_bronze"
+   },
+   "retry_on_timeout": true,
+   "task_key": "bronzecashtransaction"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "simulate_filedrops"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "Table": "customer",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/ingest_bronze"
+   },
+   "retry_on_timeout": true,
+   "task_key": "bronzecustomer"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "simulate_filedrops"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "Table": "dailymarket",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/ingest_bronze"
+   },
+   "retry_on_timeout": true,
+   "task_key": "bronzedailymarket"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "simulate_filedrops"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "Table": "holdings",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/ingest_bronze"
+   },
+   "retry_on_timeout": true,
+   "task_key": "bronzeholdings"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "simulate_filedrops"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "Table": "trade",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/ingest_bronze"
+   },
+   "retry_on_timeout": true,
+   "task_key": "bronzetrade"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "simulate_filedrops"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "Table": "watches",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/ingest_bronze"
+   },
+   "retry_on_timeout": true,
+   "task_key": "bronzewatches"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "bronzecustomer"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/bronze/account_updates_from_customer"
+   },
+   "retry_on_timeout": true,
+   "task_key": "account_updates_from_customer"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "bronzecustomer"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/DimCustomer Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "DimCustomer_Incremental"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "bronzeaccount"
+    },
+    {
+     "task_key": "account_updates_from_customer"
+    },
+    {
+     "task_key": "DimCustomer_Incremental"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/DimAccount Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "DimAccount_Incremental"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "DimAccount_Incremental"
+    },
+    {
+     "task_key": "bronzetrade"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/DimTrade Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "DimTrade_Incremental"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "bronzecashtransaction"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/currentaccountbalances Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "currentaccountbalances_Incremental"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "currentaccountbalances_Incremental"
+    },
+    {
+     "task_key": "DimAccount_Incremental"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/FactCashBalances Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "FactCashBalances_Incremental"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "bronzedailymarket"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "batch_date": "{{job.parameters.batch_date}}",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/FactMarketHistory Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "FactMarketHistory_Incremental"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "bronzeholdings"
+    },
+    {
+     "task_key": "DimTrade_Incremental"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "batch_date": "{{job.parameters.batch_date}}",
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/FactHoldings Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "FactHoldings_Incremental"
+  },
+  {
+   "depends_on": [
+    {
+     "task_key": "bronzewatches"
+    },
+    {
+     "task_key": "DimCustomer_Incremental"
+    }
+   ],
+   "max_retries": 3,
+   "min_retry_interval_millis": 15000,
+   "notebook_task": {
+    "base_parameters": {
+     "catalog": "{{job.parameters.catalog}}",
+     "scale_factor": "{{job.parameters.scale_factor}}",
+     "tpcdi_directory": "{{job.parameters.tpcdi_directory}}",
+     "wh_db": "{{job.parameters.wh_db}}"
+    },
+    "notebook_path": "${var.tpcdi_path}/src/incremental_batches/augmented_incremental/incremental/FactWatches Incremental"
+   },
+   "retry_on_timeout": true,
+   "task_key": "FactWatches_Incremental"
+  }
+ ],
+ "parameters": [
+  {
+   "default": "firstprinciplesde",
+   "name": "catalog"
+  },
+  {
+   "default": "10",
+   "name": "scale_factor"
+  },
+  {
+   "default": "/Volumes/firstprinciplesde/tpcdi_raw_data/tpcdi_volume/",
+   "name": "tpcdi_directory"
+  },
+  {
+   "default": "etl_benchmark_AugmentedIncremental_Cluster",
+   "name": "wh_db"
+  },
+  {
+   "default": "TRUE",
+   "name": "delete_tables_when_finished"
+  },
+  {
+   "default": "365",
+   "name": "incremental_batches_to_run"
+  }
+ ]
+}
